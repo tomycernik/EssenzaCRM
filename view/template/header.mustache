@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Essenza Divina</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        .navbar-custom {
+            background-color: #E26F5A !important; /* Color de fondo */
+        }
+        .navbar-custom .nav-link {
+            color: white !important; /* Color de texto blanco */
+            font-weight: bold; /* Texto en negritas */
+        }
+        .navbar-custom .nav-link:hover {
+            color: #f1f1f1 !important; /* Color de texto blanco en hover */
+        }
+    </style>
+</head>
+<body class="pt-5 nunito">
+
+<nav class="navbar navbar-expand-lg navbar-light navbar-custom fixed-top">
+    <div class="container-fluid">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                {{^userID}}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Iniciar Sesión</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/registro">Registrarse</a>
+                    </li>
+                {{/userID}}
+
+                {{#userID}}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/home">Inicio</a>
+                    </li>
+                    {{#isAdmin}}
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin">Vista admin</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="/cliente">Clientes</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="/pedido/mostrarPedidos">Pedidos</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="/pedido">Registrar pedido</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/mostrarVentasVendedores">Vendedores</a>
+                        </li>
+                    {{/isAdmin}}
+                    {{#isVendedor}}
+                        <li class="nav-item">
+                            <a class="nav-link" href="/pedido">Registrar pedido</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/pedido/mostrarPedidos">Pedidos</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="/cliente">Clientes</a>
+                        </li>
+                    {{/isVendedor}}
+                {{/userID}}
+            </ul>
+            {{#userID}}
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-danger text-white logout-button" href="/user/exit">Cerrar Sesión</a>
+                    </li>
+                </ul>
+            {{/userID}}
+        </div>
+    </div>
+</nav>
+
+<!-- JavaScript dependencies -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha384-KyZXEAg3QhqLMpG8r+Knujsl5/0c9JABz2n4fSv9F/Nwo5aW4dxLNrF6b9YoJ6It" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz4fnFO9gybRhE+6Ef1KNjF9vF3qSA6e2Anj6c7JXAw1uAA65lZi7Yz8V3" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js" integrity="sha384-mQ93NyZ9+mnBz1kQ2ZUosFtrxwoa+FDi+kLR5Z5/c7z8uWnH3q5aGiX/paBs9B8U" crossorigin="anonymous"></script>
+</body>
+</html>

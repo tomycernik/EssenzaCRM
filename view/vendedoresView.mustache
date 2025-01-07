@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ventas de Vendedores por Mes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #e77f70;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #e77f70;
+            color: #fff;
+        }
+        tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+        .highlight {
+            background-color: #e77f70;
+            font-weight: bold;
+        }
+        .total {
+            font-size: 1.1em;
+        }
+        .footer {
+            font-weight: bold;
+            background-color: #28a745;
+            color:white;
+        }
+        .vendedor {
+            background-color: #e9ecef;
+            font-weight: bold;
+        }
+
+    </style>
+</head>
+<body>
+<div class="container">
+    <br><h1>Ventas de Vendedores por Mes</h1>
+    <form method="GET" action="">
+        <label for="anio">Filtrar por año:</label>
+        <select id="anioSelect">
+            <option value="2024">2024</option>
+            <option value="2025">2025</option>
+        </select>
+    </form>
+
+    {{#alertas}}
+        <div class="alerta">
+            <button class="btn-cerrar" onclick="this.parentElement.style.display='none'">&times;</button>
+            {{.}}
+        </div>
+    {{/alertas}}
+
+    <table>
+        <thead>
+        <tr>
+            <th>Vendedor</th> <!-- Nueva columna para el vendedor -->
+            <th>Mes</th>
+            <th>Cantidad de Pedidos</th>
+            <th>Total Productos Vendidos</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{#ventas}}
+            <tr class="vendedor">
+                <td colspan="5" style="text-align: left;">
+                    <div style="margin-left: 45px;">{{nombre_vendedor}}</div>
+                </td>
+            </tr>
+
+
+            {{#meses}}
+                <tr>
+                    <td></td> <!-- Celda vacía para el vendedor en esta fila -->
+                    <td>{{mes_nombre}}</td>
+                    <td>{{cantidad_pedidos}}</td>
+                    <td>{{total_productos_vendidos}}</td>
+                </tr>
+            {{/meses}}
+        {{/ventas}}
+        </tbody>
+        <tfoot>
+        <tr class="footer">
+            <td colspan="2">Total General</td>
+            <td>{{total_general_pedidos}}</td>
+            <td>{{total_general_productos}}</td>
+        </tr>
+        </tfoot>
+    </table>
+</div>
+</body>
+<script>
+    // Al cambiar la selección, actualizamos la URL y recargamos la página
+    document.getElementById('anioSelect').addEventListener('change', function() {
+        var selectedYear = this.value;
+        var url = new URL(window.location.href);
+
+        if (selectedYear === 'todos') {
+            url.searchParams.delete('anio'); // Elimina el parámetro 'anio' si seleccionas 'todos'
+        } else {
+            url.searchParams.set('anio', selectedYear); // Actualiza el parámetro 'anio' con el año seleccionado
+        }
+
+        window.history.pushState({}, '', url); // Actualiza la URL sin recargar la página
+        window.location.reload(); // Recarga la página para aplicar el filtro
+    });
+
+    // Al cargar la página, establecemos el valor seleccionado en el select basándonos en la URL
+    window.addEventListener('load', function() {
+        var urlParams = new URLSearchParams(window.location.search);
+        var anio = urlParams.get('anio');
+
+        var select = document.getElementById('anioSelect');
+        if (anio) {
+            select.value = anio; // Establece el valor del select a partir de la URL
+        } else {
+            select.value = 'todos'; // Si no hay parámetro de año, selecciona "todos"
+        }
+    });
+</script>
+</html>
+
+
+

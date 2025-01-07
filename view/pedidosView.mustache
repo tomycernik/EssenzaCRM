@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listado de Pedidos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #e77f70;
+            text-align: center;
+            font-size: 2rem; /* Ajusta el tamaño de fuente */
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            border: 2px solid #e77f70;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            margin: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            font-size: 12px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 6px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #e77f70;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .productos,
+        .comentarios {
+            display: none;
+            list-style-type: none;
+            padding-left: 0;
+            margin-top: 10px;
+        }
+
+        .productos li,
+        .comentarios {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            padding: 10px;
+            color: #333;
+        }
+
+        .toggle-btn {
+            background-color: #e77f70;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .action-btn {
+            background-color: red;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 4px;
+            margin-right: 5px;
+        }
+
+        <style>
+         .controls-container {
+             display: flex;
+             flex-wrap: wrap;
+             gap: 15px;
+             margin-bottom: 20px;
+         }
+
+        .filtro-completo {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr; /* Establece 4 columnas para los filtros */
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .control-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 5px 0;
+        }
+
+        .control-item label {
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .control-item select, .control-item input[type="date"], .control-item button {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 0.875rem;
+        }
+
+        .control-item button {
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+
+        .control-item button:hover {
+            background-color: #45a049;
+        }
+
+        @media (max-width: 768px) {
+            .filtro-completo {
+                grid-template-columns: 1fr 1fr; /* En pantallas más pequeñas, usa dos columnas */
+            }
+        }
+
+
+        .totales-container {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            font-family: Arial, sans-serif;
+            display: flex; /* Activa el modo flexbox */
+            flex-wrap: wrap; /* Permite que los elementos se envuelvan si no caben en una línea */
+            gap: 20px; /* Espaciado entre elementos */
+        }
+
+        .totales-container p {
+            flex: 1 1 calc(33.333% - 20px); /* Cada elemento ocupa un tercio del ancho */
+            margin: 0;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .totales-container strong {
+            color: #007bff;
+            font-weight: bold;
+        }
+
+    </style>
+
+
+</head>
+
+<body>
+<br>
+<h1>Listado de Pedidos</h1>
+
+
+<div class="controls-container">
+    <div class="control-item">
+        <button onclick="generateLast15PDF()">Imprimir Últimos 15 Registros</button>
+    </div>
+
+    <div class="filtro-completo">
+        <div class="control-item">
+            <label for="anio">Año:</label>
+            <select id="anio" name="anio">
+                <option value="2025" {{#anio}}{{#anio2025}}selected{{/anio2025}}{{/anio}}>2025</option>
+                <option value="2024" {{#anio}}{{#anio2024}}selected{{/anio2024}}{{/anio}}>2024</option>
+            </select>
+        </div>
+
+
+        <div class="control-item">
+            <label for="mes">Mes:</label>
+            <select id="mes" name="mes">
+                <option value="" <?= empty($_GET['mes']) ? 'selected' : '' ?>Todos</option>
+                <option value="01" <?= $_GET['mes'] === '01' ? 'selected' : '' ?>Enero</option>
+                <option value="02" <?= $_GET['mes'] === '02' ? 'selected' : '' ?>Febrero</option>
+                <option value="03" <?= $_GET['mes'] === '03' ? 'selected' : '' ?>Marzo</option>
+                <option value="04" <?= $_GET['mes'] === '04' ? 'selected' : '' ?>Abril</option>
+                <option value="05" <?= $_GET['mes'] === '05' ? 'selected' : '' ?>Mayo</option>
+                <option value="06" <?= $_GET['mes'] === '06' ? 'selected' : '' ?>Junio</option>
+                <option value="07" <?= $_GET['mes'] === '07' ? 'selected' : '' ?>Julio</option>
+                <option value="08" <?= $_GET['mes'] === '08' ? 'selected' : '' ?>Agosto</option>
+                <option value="09" <?= $_GET['mes'] === '09' ? 'selected' : '' ?>Septiembre</option>
+                <option value="10" <?= $_GET['mes'] === '10' ? 'selected' : '' ?>Octubre</option>
+                <option value="11" <?= $_GET['mes'] === '11' ? 'selected' : '' ?>Noviembre</option>
+                <option value="12" <?= $_GET['mes'] === '12' ? 'selected' : '' ?>Diciembre</option>
+            </select>
+        </div>
+
+        <div class="control-item">
+            <label for="diaSemana">Día de la semana:</label>
+            <select id="diaSemana" name="diaSemana">
+                <option value="" <?= empty($_GET['diaSemana']) ? 'selected' : '' ?>Todos</option>
+                <option value="Lunes" <?= $_GET['diaSemana'] === 'Lunes' ? 'selected' : '' ?>Lunes</option>
+                <option value="Martes" <?= $_GET['diaSemana'] === 'Martes' ? 'selected' : '' ?>Martes</option>
+                <option value="Miércoles" <?= $_GET['diaSemana'] === 'Miércoles' ? 'selected' : '' ?>Miércoles</option>
+                <option value="Jueves" <?= $_GET['diaSemana'] === 'Jueves' ? 'selected' : '' ?>Jueves</option>
+                <option value="Viernes" <?= $_GET['diaSemana'] === 'Viernes' ? 'selected' : '' ?>Viernes</option>
+                <option value="Sábado" <?= $_GET['diaSemana'] === 'Sábado' ? 'selected' : '' ?>Sábado</option>
+                <option value="Domingo" <?= $_GET['diaSemana'] === 'Domingo' ? 'selected' : '' ?>Domingo</option>
+            </select>
+        </div>
+
+        <div class="control-item">
+            <label for="provincia">Provincia:</label>
+            <select id="provincia" name="provincia">
+                <option value="" <?= empty($_GET['provincia']) ? 'selected' : '' ?>Seleccione una provincia</option>
+                <option value="Buenos Aires" <?= $_GET['provincia'] === 'Buenos Aires' ? 'selected' : '' ?>Buenos Aires</option>
+                <option value="Catamarca" <?= $_GET['provincia'] === 'Catamarca' ? 'selected' : '' ?>Catamarca</option>
+                <option value="Chaco" <?= $_GET['provincia'] === 'Chaco' ? 'selected' : '' ?>Chaco</option>
+                <option value="Chubut" <?= $_GET['provincia'] === 'Chubut' ? 'selected' : '' ?>Chubut</option>
+                <option value="Córdoba" <?= $_GET['provincia'] === 'Córdoba' ? 'selected' : '' ?>Córdoba</option>
+                <option value="Corrientes" <?= $_GET['provincia'] === 'Corrientes' ? 'selected' : '' ?>Corrientes</option>
+                <option value="Entre Ríos" <?= $_GET['provincia'] === 'Entre Ríos' ? 'selected' : '' ?>Entre Ríos</option>
+                <option value="Formosa" <?= $_GET['provincia'] === 'Formosa' ? 'selected' : '' ?>Formosa</option>
+                <option value="Jujuy" <?= $_GET['provincia'] === 'Jujuy' ? 'selected' : '' ?>Jujuy</option>
+                <option value="La Pampa" <?= $_GET['provincia'] === 'La Pampa' ? 'selected' : '' ?>La Pampa</option>
+                <option value="La Rioja" <?= $_GET['provincia'] === 'La Rioja' ? 'selected' : '' ?>La Rioja</option>
+                <option value="Mendoza" <?= $_GET['provincia'] === 'Mendoza' ? 'selected' : '' ?>Mendoza</option>
+                <option value="Misiones" <?= $_GET['provincia'] === 'Misiones' ? 'selected' : '' ?>Misiones</option>
+                <option value="Neuquén" <?= $_GET['provincia'] === 'Neuquén' ? 'selected' : '' ?>Neuquén</option>
+                <option value="Río Negro" <?= $_GET['provincia'] === 'Río Negro' ? 'selected' : '' ?>Río Negro</option>
+                <option value="Salta" <?= $_GET['provincia'] === 'Salta' ? 'selected' : '' ?>Salta</option>
+                <option value="San Juan" <?= $_GET['provincia'] === 'San Juan' ? 'selected' : '' ?>San Juan</option>
+                <option value="San Luis" <?= $_GET['provincia'] === 'San Luis' ? 'selected' : '' ?>San Luis</option>
+                <option value="Santa Cruz" <?= $_GET['provincia'] === 'Santa Cruz' ? 'selected' : '' ?>Santa Cruz</option>
+                <option value="Santa Fe" <?= $_GET['provincia'] === 'Santa Fe' ? 'selected' : '' ?>Santa Fe</option>
+                <option value="Santiago del Estero" <?= $_GET['provincia'] === 'Santiago del Estero' ? 'selected' : '' ?>Santiago del Estero</option>
+                <option value="Tierra del Fuego" <?= $_GET['provincia'] === 'Tierra del Fuego' ? 'selected' : '' ?>Tierra del Fuego</option>
+                <option value="Tucumán" <?= $_GET['provincia'] === 'Tucumán' ? 'selected' : '' ?>Tucumán</option>
+            </select>
+        </div>
+        <div class="control-item">
+            <label for="localidad">Localidad:</label>
+            <input type="text" id="localidad" name="localidad" value="{{localidad}}" placeholder="Ingrese localidad">
+        </div>
+
+        <div class="control-item">
+            <label for="metodoPago">Método de pago:</label>
+            <select id="metodoPago" name="metodoPago">
+                <option value="" <?= empty($_GET['metodoPago']) ? 'selected' : '' ?>Todos</option>
+                <option value="efectivo" <?= $_GET['metodoPago'] === 'efectivo' ? 'selected' : '' ?>Efectivo</option>
+                <option value="tarjeta_debito" <?= $_GET['metodoPago'] === 'tarjeta_debito' ? 'selected' : '' ?>Tarjeta de débito</option>
+                <option value="tarjeta_credito" <?= $_GET['metodoPago'] === 'tarjeta_credito' ? 'selected' : '' ?>Tarjeta de crédito</option>
+                <option value="transferencia" <?= $_GET['metodoPago'] === 'transferencia' ? 'selected' : '' ?>Transferencia</option>
+                <option value="mercado_pago" <?= $_GET['metodoPago'] === 'mercado_pago' ? 'selected' : '' ?>Mercado Pago</option>
+            </select>
+        </div>
+        <div class="control-item">
+            <label for="fechaInicio">Fecha de Inicio:</label>
+            <input type="date" id="fechaInicio" name="fechaInicio" value="<?= $_GET['fechaInicio'] ?? '' ?>">
+        </div>
+        <div class="control-item">
+            <label for="fechaFin">Fecha de Fin:</label>
+            <input type="date" id="fechaFin" name="fechaFin" value="<?= $_GET['fechaFin'] ?? '' ?>">
+        </div>
+        <div class="control-item">
+            <button onclick="aplicarFiltros()">Aplicar Filtros</button>
+            <button onclick="limpiarFiltro()">Limpiar Filtros</button>
+        </div>
+    </div>
+
+    <table id="pedidosTable">
+    <thead>
+    <tr>
+        <th>Pedido #</th>
+        <th>Fecha</th>
+        <th>Cliente</th>
+        <th>DNI</th>
+        <th>Provincia</th>
+        <th>Localidad</th>
+        <th>Medio de Pago</th>
+        <th>Costo de Productos</th>
+        <th>Costo de Envío</th>
+        <th>Costo Total</th>
+        <th>Comentario</th>
+        <th>Vendedor</th>
+        <th>Total de Productos</th>
+        <th>Productos</th>
+        <th>Acción</th>
+    </tr>
+    </thead>
+    <tbody>
+    {{#pedidos}}
+        <tr>
+            <td>{{pedido_id}}</td>
+            <td>{{dia_semana}} - {{fecha}}</td>
+            <td>
+                <a href="/ed/EssenzaDivinaCRM-master/cliente/mostrarPerfilCliente?id={{cliente_id}}" style="color:blue; text-decoration:underline;">
+                {{cliente}}
+            </td>
+            <td>{{dni}}</td>
+            <td>{{provincia}}</td>
+            <td>{{localidad}}</td>
+            <td>{{medio_de_pago}}</td>
+            <td>${{costo_productos}}</td>
+            <td>${{costo_envio}}</td>
+            <td>${{costo_total}}</td>
+            <td>
+                <button class="toggle-btn" onclick="toggleComment(this)">Ver Comentario</button>
+                <div class="comentarios">{{comentario}}</div>
+            </td>
+            <td>{{vendedor}}</td>
+            <td>{{cantidad_productos}}</td>
+            <td>
+                <button class="toggle-btn" onclick="toggleProducts(this)">Ver Productos</button>
+                <ul class="productos">
+                    {{#productos}}
+                        <li><strong>{{tipo}} - {{aroma}}:</strong> {{cantidad}}</li>
+                    {{/productos}}
+                </ul>
+            </td>
+            <td>
+                <button onclick="generatePDF(this)">PDF</button>
+                <button class="action-btn" onclick="borrarPedido({{pedido_id}})">Borrar</button>
+            </td>
+        </tr>
+
+    {{/pedidos}}
+    </tbody>
+</table>
+
+    <div class="totales-container">
+        <p><strong>Total de Pedidos:</strong> {{total_pedidos}}</p>
+        <p><strong>Total de Productos:</strong> {{total_productos}}</p>
+        <p><strong>Total de Costo de Productos:</strong> ${{total_costo_productos}}</p>
+        <p><strong>Total de Concentrados:</strong> {{total_concentrados}}</p>
+        <p><strong>Total de Difusores:</strong> {{total_difusores}}</p>
+        <p><strong>Total de Textiles:</strong> {{total_textiles}}</p>
+    </div>
+
+
+    <div class="pagination-container">
+        <button onclick="goToPage({{paginaAnterior}})" {{#paginaAnteriorDeshabilitada}}disabled{{/paginaAnteriorDeshabilitada}}>Anterior</button>
+        <span>Pagina {{pagina}} de {{total_paginas}}</span>
+        <button onclick="goToPage({{paginaSiguiente}})" {{#paginaSiguienteDeshabilitada}}disabled{{/paginaSiguienteDeshabilitada}}>Siguiente</button>
+    </div>
+
+
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.10/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.3.1/jspdf.umd.min.js"></script>
+<script>
+    async function generateLast15PDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('landscape', 'pt', 'a4'); // Horizontal, puntos, tamaño A4
+
+        const table = document.getElementById("pedidosTable");
+        const rows = Array.from(table.getElementsByTagName("tr"));
+        const first15Rows = rows.slice(0, 16); // Primeras 15 filas + encabezado
+
+        // Encabezados del PDF
+        doc.setFontSize(18);
+        doc.text("Primeros 15 Pedidos", 40, 40);
+        doc.setFontSize(10);
+
+        // Definir encabezados de la tabla
+        const headers = ["Pedido #", "Fecha", "Cliente", "DNI", "Costo Total", "Total de Productos"];
+        let startY = 70; // Posición inicial Y
+
+        // Anchos de columna para ajustar el espaciado
+        const columnWidths = [60, 80, 180, 80, 100, 100]; // Aumentar el ancho de la columna del cliente
+        const startX = 40; // Posición inicial X
+        const rowHeight = 15; // Altura de la fila
+
+        // Dibujar encabezados
+        headers.forEach((header, index) => {
+            const x = startX + columnWidths.slice(0, index).reduce((a, b) => a + b, 0);
+            doc.text(header, x, startY);
+        });
+        startY += rowHeight; // Espacio después de los encabezados
+
+        // Añadir filas de datos
+        first15Rows.forEach((row, rowIndex) => {
+            if (rowIndex === 0) return; // Ignorar el encabezado de la tabla HTML
+            const cells = Array.from(row.getElementsByTagName("td"));
+
+            // Obtener datos relevantes
+            const rowData = [
+                cells[0].textContent, // Pedido #
+                cells[1].textContent, // Fecha
+                cells[2].textContent, // Cliente
+                cells[3].textContent, // DNI
+                cells[9].textContent, // Costo Total
+                cells[12].textContent  // Total de Productos
+            ];
+
+            // Calcular posición Y para esta fila
+            const rowY = startY + (rowHeight * (rowIndex - 1)); // Restar 1 para no contar el encabezado
+
+            // Añadir datos de la fila
+            rowData.forEach((text, cellIndex) => {
+                const textX = startX + columnWidths.slice(0, cellIndex).reduce((a, b) => a + b, 0);
+
+                if (cellIndex === 2) { // Solo para el nombre del cliente
+                    const splitText = doc.splitTextToSize(text, columnWidths[cellIndex]);
+                    const clientTextX = textX - 10; // Desplazar a la izquierda 10 puntos
+
+                    splitText.forEach((line, lineIndex) => {
+                        const adjustedY = rowY + (lineIndex * 5); // Ajustar posición Y para centrar verticalmente
+                        doc.text(line, clientTextX, adjustedY);
+                    });
+                } else {
+                    // Ajustar la posición Y para centrar verticalmente
+                    const adjustedY = rowY + (rowHeight - 5); // Ajustar posición Y para centrar verticalmente
+                    doc.text(text, textX, adjustedY);
+                }
+            });
+
+            // Ajustar la posición Y para la siguiente fila
+            startY += rowHeight; // Mover hacia abajo para la siguiente fila
+        });
+
+        // Guardar el PDF
+        doc.save("primeros_15_pedidos.pdf");
+    }
+
+
+
+    function toggleProducts(button) {
+        var productos = button.nextElementSibling;
+        if (productos.style.display === "none" || productos.style.display === "") {
+            productos.style.display = "block";
+            button.textContent = "Ocultar Productos";
+        } else {
+            productos.style.display = "none";
+            button.textContent = "Ver Productos";
+        }
+    }
+
+    function toggleComment(button) {
+        var comentario = button.nextElementSibling;
+        if (comentario.style.display === "none" || comentario.style.display === "") {
+            comentario.style.display = "block";
+            button.textContent = "Ocultar Comentario";
+        } else {
+            comentario.style.display = "none";
+            button.textContent = "Ver Comentario";
+        }
+    }
+
+    function generatePDF(button) {
+        const {jsPDF} = window.jspdf;
+        const doc = new jsPDF({orientation: 'portrait', unit: 'mm', format: 'A4', putOnlyUsedFonts: true});
+
+        const row = button.closest('tr');
+        const cells = row.cells;
+
+        // Extracción de datos de las celdas
+        const data = {
+            pedidoId: cells[0].textContent.trim(),
+            fecha: cells[1].textContent.trim(),
+            cliente: cells[2].textContent.trim(),
+            provincia: cells[4].textContent.trim(),
+            localidad: cells[5].textContent.trim(),
+            medioPago: cells[6].textContent.trim(),
+            costoProductos: cells[7].textContent.trim(),
+            costoEnvio: cells[8].textContent.trim(),
+            costoTotal: cells[9].textContent.trim(),
+            cantidadProductos: cells[12].textContent.trim(),
+            vendedor: cells[11].textContent.trim(),
+        };
+
+        // Extraer comentario directamente del <div> de la celda
+        const comentarioDiv = cells[10].querySelector('.comentarios');
+        data.comentario = comentarioDiv ? comentarioDiv.textContent.trim() : "Sin comentario";
+
+        const marginLeft = 15;
+        const marginTop = 20;
+        const colWidth = 85; // Mantener un ancho razonable
+        const lineHeight = 8;
+        let currentY = marginTop;
+
+        const pageHeight = doc.internal.pageSize.height; // Altura de la página
+        const maxY = pageHeight - 20; // Límite inferior para agregar contenido antes de un salto de página
+
+// Encabezado
+        doc.setFontSize(14);
+        doc.setFont("Helvetica", "bold");
+        doc.text("Detalles del Pedido", doc.internal.pageSize.getWidth() / 2, currentY, {align: 'center'});
+        currentY += 12;
+
+// Datos del pedido
+        const labels = [
+            "Pedido #", "Fecha", "Cliente", "Provincia", "Localidad",
+            "Medio de Pago", "Costo de Productos", "Costo de Envío",
+            "Costo Total", "Total de productos", "Vendedor", "Comentario"
+        ];
+
+        doc.setFont("Helvetica", "bold");
+        labels.forEach((label, index) => {
+            doc.text(label, marginLeft, currentY);
+            currentY += lineHeight;
+            if (currentY > maxY) { // Si excede la altura de la página, agrega una nueva página
+                doc.addPage();
+                currentY = marginTop;
+            }
+        });
+
+        doc.setFont("Helvetica", "normal");
+        currentY -= lineHeight * labels.length; // Ajustar la posición Y después de las etiquetas
+
+        Object.values(data).forEach((value, index) => {
+            // Asegurando un correcto alineamiento
+            const textXPosition = marginLeft + colWidth - 5; // Ajustar la posición X para el texto
+            if (index === 11) { // Para el comentario
+                const maxWidth = 110;  // Aumentar el ancho permitido para el comentario
+                const commentLines = doc.splitTextToSize(value, maxWidth);
+
+                commentLines.forEach((line) => {
+                    if (currentY + lineHeight > maxY) {
+                        doc.addPage();
+                        currentY = marginTop;
+                    }
+                    doc.text(line, textXPosition, currentY); // Ajustar la posición X
+                    currentY += lineHeight; // No añadir espacio extra aquí
+                });
+            } else {
+                doc.text(value, textXPosition, currentY); // Ajustar el contenido
+                currentY += lineHeight;
+                if (currentY > maxY) {
+                    doc.addPage();
+                    currentY = marginTop;
+                }
+            }
+        });
+
+// Detalles de los productos
+        const productos = row.querySelector('.productos');
+        let productCategories = {
+            concentrados: "",
+            difusores: "",
+            textiles: ""
+        };
+
+        if (productos) {
+            productos.querySelectorAll('li').forEach((producto) => {
+                const text = producto.textContent.trim();
+                if (text.includes("Concentrado")) {
+                    productCategories.concentrados += text + "\n";
+                } else if (text.includes("Difusor")) {
+                    productCategories.difusores += text + "\n";
+                } else if (text.includes("Textil")) {
+                    productCategories.textiles += text + "\n";
+                }
+            });
+        }
+
+        if (Object.values(productCategories).some(cat => cat.trim() !== "")) {
+            currentY += 10;
+            doc.setFontSize(12);
+            doc.setFont("Helvetica", "bold");
+            doc.text("Productos:", marginLeft, currentY);
+            currentY += 8;
+            doc.setFont("Helvetica", "normal");
+
+            const categories = [
+                {name: "Concentrados", content: productCategories.concentrados},
+                {name: "Difusores", content: productCategories.difusores},
+                {name: "Textiles", content: productCategories.textiles}
+            ];
+
+            categories.forEach(category => {
+                if (category.content.trim() !== "") {
+                    doc.setFont("Helvetica", "bold");
+                    doc.text(category.name + ":", marginLeft, currentY);
+                    currentY += 8;
+                    if (currentY > maxY) {
+                        doc.addPage();
+                        currentY = marginTop;
+                    }
+
+                    doc.setFont("Helvetica", "normal");
+                    const productsLines = doc.splitTextToSize(category.content, 170);
+                    productsLines.forEach(line => {
+                        if (currentY + lineHeight > maxY) {
+                            doc.addPage();
+                            currentY = marginTop;
+                        }
+                        doc.text(line, marginLeft, currentY);
+                        currentY += 10;
+                    });
+                }
+            });
+        }
+
+        currentY += 15;
+        doc.setFontSize(8);
+        doc.setTextColor(100, 100, 100);
+        doc.text(`Generado el: ${new Date().toLocaleDateString()}`, marginLeft, currentY);
+
+// Guardar PDF
+        doc.save(`Pedido_${data.pedidoId}.pdf`);
+    }
+
+
+
+        function borrarPedido(pedidoId) {
+        if (confirm("¿Estás seguro de que quieres borrar este pedido?")) {
+        // Redirige a la página de eliminación con el pedido_id en la URL
+        window.location.href = `/ed/EssenzaDivinaCRM-master/pedido/borrarPedido?id=${pedidoId}`;
+    }
+    }
+
+    function aplicarFiltros() {
+        const mes = document.getElementById('mes').value;
+        let anio = document.getElementById('anio').value; // Obtener el valor del filtro de año
+        const provincia = document.getElementById('provincia').value;
+        const localidad = document.getElementById('localidad').value;
+        const metodoPago = document.getElementById('metodoPago').value;
+        const fechaInicio = document.getElementById('fechaInicio').value;
+        const fechaFin = document.getElementById('fechaFin').value;
+        const diaSemana = document.getElementById('diaSemana').value;
+
+        // Establecer 2025 como valor por defecto si el filtro de año está vacío
+        if (!anio) {
+            anio = '2025';
+        }
+
+        const queryParams = new URLSearchParams({
+            mes,
+            anio, // Incluir el año en los parámetros de la URL
+            provincia,
+            localidad,
+            metodoPago,
+            fechaInicio,
+            fechaFin,
+            diaSemana
+        });
+
+        window.location.href = `?${queryParams.toString()}`;
+    }
+
+
+
+
+    function limpiarFiltro() {
+        window.location.href = window.location.pathname; // Recarga sin filtros
+    }
+
+
+    function goToPage(pageNumber) {
+        const url = new URL(window.location.href);
+        const params = new URLSearchParams(url.search);
+        params.set('pagina', pageNumber);
+        window.location.href = url.pathname + '?' + params.toString();
+    }
+
+
+</script>
+</body>
+
+</html>
+
+
+
+
+

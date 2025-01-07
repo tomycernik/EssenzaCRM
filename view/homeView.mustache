@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #007bff;
+        }
+        .button-group {
+            text-align: center;
+        }
+        .button-group .btn {
+            margin: 10px;
+            font-size: 18px;
+            padding: 15px 30px;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            border: none;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            border: none;
+        }
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+</form>
+<div class="container">
+    {{#isAdmin}}
+        <div class="header">
+            <br> <h2>Bienvenido al sistema de Essenza Divina</h2>
+        </div>
+        <div class="button-group">
+            <a class="btn btn-primary" href="/ed/EssenzaDivinaCRM-master/pedido">Registrar pedido</a>
+        </div>
+    {{/isAdmin}}
+
+    {{#isVendedor}}
+        <div class="header">
+           <br> <h2>¡Bienvenido/a al sistema de Essenza Divina, {{username}}!</h2>
+        </div>
+
+        <div class="button-group">
+            <a class="btn btn-primary" href="/ed/EssenzaDivinaCRM-master/pedido">Registrar pedido</a>
+        </div>
+        <div class="button-group">
+            <a class="btn btn-primary" href="/ed/EssenzaDivinaCRM-master/cliente">Clientes</a>
+        </div>
+    {{/isVendedor}}
+</div>
+</body>
+</html>
+
+

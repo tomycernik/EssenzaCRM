@@ -1,0 +1,99 @@
+<!-- Page content -->
+<div class="w3-content" style="max-width:2000px;margin-top:46px">
+    <main class="py-5">
+        <div class="content container px-lg-5 p-4 bg-light rounded-3">
+            <h2 class="text-center display-3 fw-bold">Registro de nuevo cliente</h2>
+            <br>
+            <form action="/registro/registrarCliente" method="post" enctype="multipart/form-data" class="row g-3">
+                <div class="col-md-6">
+                    <div class="col-md-12">
+                        <label for="nombre" class="form-label">Nombre Completo:</label>
+                        <input id="nombre" type="text" name="nombre" class="form-control" required placeholder="Ingrese su nombre completo">
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="col-md-12">
+                        <label for="dni" class="form-label">DNI:</label>
+                        <input id="dni" type="text" name="dni" class="form-control" required placeholder="Ingrese su DNI">
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="col-md-12">
+                        <label for="celular" class="form-label">Celular:</label>
+                        <input id="celular" type="text" name="celular" class="form-control"  placeholder="Ingrese su celular">
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="col-md-12">
+                        <label for="provincia" class="form-label">Provincia:</label>
+                        <select id="provincia" name="provincia" class="form-control" >
+                            <option value="">Seleccione una provincia</option>
+                            <option value="Buenos Aires">Buenos Aires</option>
+                            <option value="Catamarca">Catamarca</option>
+                            <option value="Chaco">Chaco</option>
+                            <option value="Chubut">Chubut</option>
+                            <option value="Córdoba">Córdoba</option>
+                            <option value="Corrientes">Corrientes</option>
+                            <option value="Entre Ríos">Entre Ríos</option>
+                            <option value="Formosa">Formosa</option>
+                            <option value="Jujuy">Jujuy</option>
+                            <option value="La Pampa">La Pampa</option>
+                            <option value="La Rioja">La Rioja</option>
+                            <option value="Mendoza">Mendoza</option>
+                            <option value="Misiones">Misiones</option>
+                            <option value="Neuquén">Neuquén</option>
+                            <option value="Río Negro">Río Negro</option>
+                            <option value="Salta">Salta</option>
+                            <option value="San Juan">San Juan</option>
+                            <option value="San Luis">San Luis</option>
+                            <option value="Santa Cruz">Santa Cruz</option>
+                            <option value="Santa Fe">Santa Fe</option>
+                            <option value="Santiago del Estero">Santiago del Estero</option>
+                            <option value="Tierra del Fuego">Tierra del Fuego</option>
+                            <option value="Tucumán">Tucumán</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="col-md-12">
+                        <label for="localidad" class="form-label">Localidad:</label>
+                        <input id="localidad" type="text" name="localidad" class="form-control"  placeholder="Ingrese su localidad">
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="col-md-12">
+                        <label for="codigo_postal" class="form-label">Codigo postal:</label>
+                        <input id="codigo_postal" type="text" name="codigo_postal" class="form-control"  placeholder="Ingrese su codigo postal">
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="col-md-12">
+                        <label for="direccion" class="form-label">Direccion:</label>
+                        <input id="direccion" type="text" name="direccion" class="form-control"  placeholder="Ingrese su direccion">
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <br>
+                    <div class="d-flex justify-content-center">
+                        <input type="submit" value="Registrar" class="btn btn-primary btn-lg">
+                    </div>
+                </div>
+
+                {{#showMessage}}
+                    <div>
+                        <h4>{{message}}</h4>
+                    </div>
+                {{/showMessage}}
+            </form>
+        </div>
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>

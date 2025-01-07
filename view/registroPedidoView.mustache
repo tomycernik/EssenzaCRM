@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar Pedido</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #343a40;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            font-weight: bold;
+        }
+        .producto {
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background-color: #ffffff;
+            position: relative;
+        }
+        .producto select,
+        .producto input {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .btn-custom {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+        }
+        .btn-custom:hover {
+            background-color: #0056b3;
+        }
+        .btn-secondary-custom {
+            background-color: #6c757d;
+            color: #fff;
+            border: none;
+        }
+        .btn-secondary-custom:hover {
+            background-color: #5a6268;
+        }
+        .btn-remove {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #dc3545;
+            color: #fff;
+            border: none;
+            border-radius: 3px;
+        }
+        .btn-remove:hover {
+            background-color: #c82333;
+        }
+        #total_productos_container {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <br><br> <h1>Registrar Pedido</h1>
+    <form action="/pedido/registrarPedido" method="post">
+
+                <div class="form-group">
+                    <label>Fecha del Pedido:</label>
+                    <div class="form-check">
+                        <input type="radio" id="fecha_actual" name="fecha_opcion" class="form-check-input" value="actual" checked onclick="toggleFecha(false)">
+                        <label class="form-check-label" for="fecha_actual">Usar fecha actual</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="radio" id="fecha_personalizada" name="fecha_opcion" class="form-check-input" value="personalizada" onclick="toggleFecha(true)">
+                        <label class="form-check-label" for="fecha_personalizada">Elegir fecha personalizada</label>
+                    </div>
+                    <input type="date" id="fecha" name="fecha" class="form-control" style="display: none;">
+                </div>
+
+        <div class="form-group">
+            <div class="form-group">
+                <label for="dni_busqueda">Buscar Cliente por DNI:</label>
+                <div class="input-group">
+                    <input type="text" id="dni_busqueda" class="form-control" placeholder="Ingrese DNI del cliente">
+                    <div class="input-group-append">
+                        <button type="button" id="btn_buscar_cliente" class="btn btn-primary btn-custom">Buscar</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="cliente">Cliente:</label>
+                <select name="cliente" id="cliente" class="form-control" required>
+                    <option value="">Seleccione un cliente</option>
+                    {{#clientes}}
+                        <option value="{{id}}">{{nombre}}</option>
+                    {{/clientes}}
+                </select>
+            </div>
+
+            <div id="datos_cliente" style="display: none;">
+                <div class="form-group">
+                    <label>Nombre:</label>
+                    <p id="nombre_cliente">--</p>
+                </div>
+                <div class="form-group">
+                    <label>DNI:</label>
+                    <p id="dni_cliente">--</p>
+                </div>
+                <div class="form-group">
+                    <label>Provincia:</label>
+                    <p id="provincia">--</p>
+                </div>
+                <div class="form-group">
+                    <label>Localidad:</label>
+                    <p id="localidad">--</p>
+                </div>
+                <div class="form-group">
+                    <label>CP:</label>
+                    <p id="codigo_postal">--</p>
+                </div>
+                <div class="form-group">
+                    <label>Direccion:</label>
+                    <p id="direccion">--</p>
+                </div>
+                <div class="form-group">
+                    <label>Celular:</label>
+                    <p id="celular">--</p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <button type="button" id="btn_agregar_cliente" class="btn btn-secondary btn-secondary-custom" onclick="redireccionarYDesactivar()">Agregar Cliente</button>
+            </div>
+
+            <h3>Productos</h3>
+            <div id="total_productos_container" class="form-group">
+                <label>Total de Cantidad de Productos:</label>
+                <p id="total_productos_value">0</p>
+            </div>
+            <div id="productos">
+                <div class="producto">
+                    <button type="button" class="btn btn-remove" onclick="removeProduct(this)">Eliminar</button>
+                    <div class="form-group">
+                        <label for="producto_1">Producto:</label>
+                        <select name="productos[0][id]" id="producto_1" class="form-control" required>
+                            {{#productos}}
+                                <option value="{{id}}">{{nombre}} - {{tipo}} - {{aroma}}</option>
+                            {{/productos}}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="cantidad_1">Cantidad:</label>
+                        <input type="number" name="productos[0][cantidad]" id="cantidad_1" class="form-control" required>
+                    </div>
+                </div>
+            </div>
+
+            <button type="button" id="agregar_producto" class="btn btn-secondary btn-secondary-custom">Agregar Producto</button>
+
+            <div class="form-group">
+                <label for="costo_productos">Costo de Productos:</label>
+                <input type="number" step="0.01" name="costo_productos" id="costo_productos" class="form-control" required onchange="calcularCostoTotal()">
+            </div>
+            <div class="form-group">
+                <label for="costo_envio">Costo de Envío:</label>
+                <input type="number" step="0.01" name="costo_envio" id="costo_envio" class="form-control" required onchange="calcularCostoTotal()">
+            </div>
+            <div class="form-group">
+                <label for="costo_total">Costo Total:</label>
+                <input type="number" step="0.01" name="costo_total" id="costo_total" class="form-control" readonly>
+            </div>
+            <div class="form-group">
+                <label for="comentario">Comentario:</label>
+                <input type="text" step="0.01" name="comentario" id="comentario" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="medio_de_pago">Medio de Pago:</label>
+                <select name="medio_de_pago" id="medio_de_pago" class="form-control" required>
+                    <option value="mercado_pago">Mercado Pago</option>
+                    <option value="transferencia">Transferencia</option>
+                    <option value="tarjeta_debito">Tarjeta de Débito</option>
+                    <option value="tarjeta_credito">Tarjeta de Crédito</option>
+                    <option value="efectivo">Efectivo</option>
+                </select>
+            </div>
+
+            <!-- Aquí está el botón de previsualización -->
+            <button type="button" class="btn btn-warning btn-custom" onclick="previsualizarPedido()">Confirmar Pedido</button>
+
+            <!-- Modal de previsualización -->
+            <div id="previsualizacion_modal" style="display: none; background-color: #ffffff; border: 1px solid #dee2e6; padding: 20px; border-radius: 5px; margin-top: 20px;">
+                <!-- Aquí se insertará la previsualización del pedido -->
+            </div>
+    </form>
+</div>
+
+<script>
+
+    function previsualizarPedido() {
+        // Capturar datos del cliente
+        const cliente = document.getElementById('cliente').selectedOptions[0].textContent;
+        const nombreCliente = document.getElementById('nombre_cliente').textContent;
+        const dniCliente = document.getElementById('dni_cliente').textContent;
+        const provincia = document.getElementById('provincia').textContent;
+        const localidad = document.getElementById('localidad').textContent;
+        const codigoPostal = document.getElementById('codigo_postal').textContent;
+        const direccion = document.getElementById('direccion').textContent;
+        const celular = document.getElementById('celular').textContent;
+
+        // Capturar datos de los productos
+        const productos = [];
+        document.querySelectorAll('.producto').forEach((productoDiv, index) => {
+            const productoNombre = productoDiv.querySelector('select').selectedOptions[0].textContent;
+            const cantidad = productoDiv.querySelector('input[type="number"]').value;
+            productos.push({ productoNombre, cantidad });
+        });
+
+        // Capturar otros datos del pedido
+        const costoProductos = document.getElementById('costo_productos').value;
+        const costoEnvio = document.getElementById('costo_envio').value;
+        const costoTotal = document.getElementById('costo_total').value;
+        const medioDePago = document.getElementById('medio_de_pago').selectedOptions[0].textContent;
+
+        // Crear el contenido de la previsualización
+        let previsualizacionHTML = `
+    <div style="padding: 20px; border: 1px solid #ddd; border-radius: 10px; box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); background-color: #f9f9f9;">
+        <h3 style="border-bottom: 2px solid #007bff; padding-bottom: 5px;">Confirmar Pedido</h3>
+        <div style="margin-bottom: 15px;">
+            <h4 style="color: #007bff;">Cliente</h4>
+            <p><strong>Nombre:</strong> ${nombreCliente}</p>
+            <p><strong>DNI:</strong> ${dniCliente}</p>
+            <p><strong>Provincia:</strong> ${provincia}</p>
+            <p><strong>Localidad:</strong> ${localidad}</p>
+            <p><strong>CP:</strong> ${codigoPostal}</p>
+            <p><strong>Dirección:</strong> ${direccion}</p>
+            <p><strong>Celular:</strong> ${celular}</p>
+        </div>
+        <div style="margin-bottom: 15px;">
+            <h4 style="color: #007bff;">Productos</h4>
+            <ul style="list-style-type: none; padding: 0;">
+    `;
+        productos.forEach((prod, index) => {
+            previsualizacionHTML += `
+            <li style="padding: 5px 0; border-bottom: 1px solid #ddd;">
+                <span style="font-weight: bold;">${prod.productoNombre}</span> - Cantidad: ${prod.cantidad}
+            </li>`;
+        });
+        previsualizacionHTML += `
+            </ul>
+        </div>
+        <div style="margin-bottom: 15px;">
+            <h4 style="color: #007bff;">Costos</h4>
+            <p><strong>Costo de Productos:</strong> $${costoProductos}</p>
+            <p><strong>Costo de Envío:</strong> $${costoEnvio}</p>
+            <p style="font-size: 1.2em; font-weight: bold;">Costo Total: $${costoTotal}</p>
+        </div>
+        <div style="margin-bottom: 15px;">
+            <h4 style="color: #007bff;">Medio de Pago</h4>
+            <p>${medioDePago}</p>
+        </div>
+        <div style="text-align: center;">
+            <button type="submit" class="btn btn-primary btn-custom" style="margin: 5px;">Confirmar y Registrar Pedido</button>
+            <button type="button" class="btn btn-secondary btn-custom" style="margin: 5px;" onclick="cerrarPrevisualizacion()">Cancelar</button>
+        </div>
+    </div>
+    `;
+
+        // Mostrar la previsualización en un modal o en una nueva sección
+        const modal = document.getElementById('previsualizacion_modal');
+        modal.innerHTML = previsualizacionHTML;
+        modal.style.display = 'block';
+    }
+
+    function cerrarPrevisualizacion() {
+        document.getElementById('previsualizacion_modal').style.display = 'none';
+    }
+
+
+
+    function actualizarTotalProductos() {
+        let total = 0;
+        const cantidades = document.querySelectorAll('#productos input[type="number"]');
+        cantidades.forEach(function(input) {
+            total += parseInt(input.value) || 0;
+        });
+        document.getElementById('total_productos_value').textContent = total;
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        actualizarTotalProductos();
+        actualizarOpcionesProductos();  // Actualizar las opciones de productos al cargar la página
+
+        // Escucha cambios en las cantidades de productos
+        document.getElementById('productos').addEventListener('input', function(event) {
+            if (event.target && event.target.matches('input[type="number"]')) {
+                actualizarTotalProductos();
+            }
+        });
+
+        // Escucha cambios en la selección de productos
+        document.getElementById('productos').addEventListener('change', function(event) {
+            if (event.target && event.target.matches('select.producto-select')) {
+                actualizarOpcionesProductos();
+            }
+        });
+    });
+
+    function actualizarOpcionesProductos() {
+        // Obtener todas las selecciones actuales de productos
+        const seleccionados = Array.from(document.querySelectorAll('.producto-select'))
+                .map(select => select.value)
+                .filter(value => value);  // Filtra los valores no seleccionados (vacíos)
+
+        // Actualiza las opciones de cada selector de productos
+        document.querySelectorAll('.producto-select').forEach(select => {
+            const opciones = select.querySelectorAll('option');
+            opciones.forEach(opcion => {
+                if (seleccionados.includes(opcion.value) && opcion.value !== select.value) {
+                    // Deshabilita la opción si ya está seleccionada en otro select
+                    opcion.disabled = true;
+                } else {
+                    // Habilita la opción si no está seleccionada
+                    opcion.disabled = false;
+                }
+            });
+        });
+    }
+
+    document.getElementById('agregar_producto').addEventListener('click', function() {
+        const productosDiv = document.getElementById('productos');
+        const productoElements = productosDiv.getElementsByClassName('producto');
+        const index = productoElements.length;
+
+        // Obtener productos seleccionados previamente
+        const productosSeleccionados = Array.from(document.querySelectorAll('.producto select'))
+                .map(select => select.value);
+
+        // Crear nuevo div para el producto
+        const newProductDiv = document.createElement('div');
+        newProductDiv.className = 'producto';
+
+        // Generar opciones filtradas para el select
+        let opcionesProducto = '';
+        document.querySelectorAll('#producto_1 option').forEach(option => {
+            const productoId = option.value;
+            // Solo añadir productos que no han sido seleccionados
+            if (!productosSeleccionados.includes(productoId)) {
+                opcionesProducto += `<option value="${productoId}">${option.textContent}</option>`;
+            }
+        });
+
+        newProductDiv.innerHTML = `
+        <button type="button" class="btn btn-remove" onclick="removeProduct(this)">Eliminar</button>
+        <div class="form-group">
+            <label for="producto_${index + 1}">Producto:</label>
+            <select name="productos[${index}][id]" id="producto_${index + 1}" class="form-control" required>
+                ${opcionesProducto}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="cantidad_${index + 1}">Cantidad:</label>
+            <input type="number" name="productos[${index}][cantidad]" id="cantidad_${index + 1}" class="form-control" required>
+        </div>
+    `;
+
+        // Añadir el nuevo producto al contenedor
+        productosDiv.appendChild(newProductDiv);
+
+        // Actualizar el total de productos
+        actualizarTotalProductos();
+    });
+
+    function removeProduct(button) {
+        const productosDiv = document.getElementById('productos');
+        const productoElements = productosDiv.getElementsByClassName('producto');
+
+        if (productoElements.length > 1) {
+            productosDiv.removeChild(button.parentNode);
+            actualizarTotalProductos();
+            actualizarOpcionesProductos();  // Actualizar las opciones al eliminar un producto
+        } else {
+            alert("Debe haber al menos un producto en el pedido.");
+        }
+    }
+
+
+    function calcularCostoTotal() {
+        const costoProductos = parseFloat(document.getElementById('costo_productos').value) || 0;
+        const costoEnvio = parseFloat(document.getElementById('costo_envio').value) || 0;
+        const costoTotal = costoProductos + costoEnvio;
+        document.getElementById('costo_total').value = costoTotal.toFixed(2);
+    }
+
+    document.getElementById('btn_buscar_cliente').addEventListener('click', function() {
+        const dniBusqueda = document.getElementById('dni_busqueda').value.trim();
+        const url = dniBusqueda ? '/cliente/buscarPorDni' : '/cliente/obtenerTodos';
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: dniBusqueda ? new URLSearchParams({ dni: dniBusqueda }) : null,
+        })
+                .then(response => response.json())
+                .then(data => {
+                    const clienteSelect = document.getElementById('cliente');
+
+                    if (data.length > 0) { // Si se encontró al menos un cliente
+                        clienteSelect.innerHTML = '<option value="">Se ha encontrado un cliente, seleccionelo</option>';
+                        data.forEach(cliente => {
+                            clienteSelect.innerHTML += `<option value="${cliente.id}">${cliente.nombre}</option>`;
+                        });
+                    } else {
+                        clienteSelect.innerHTML = '<option value="">No se encontró un cliente</option>';
+                    }
+                })
+                .catch(error => console.error('Error al buscar cliente:', error));
+    });
+
+
+
+
+    function cargarDatosCliente(cliente) {
+        document.getElementById('nombre_cliente').textContent = cliente.nombre;
+        document.getElementById('dni_cliente').textContent = cliente.dni;
+        document.getElementById('provincia').textContent = cliente.provincia;
+        document.getElementById('localidad').textContent = cliente.localidad;
+        document.getElementById('codigo_postal').textContent = cliente.codigo_postal;
+        document.getElementById('direccion').textContent = cliente.direccion;
+        document.getElementById('celular').textContent = cliente.celular;
+        document.getElementById('datos_cliente').style.display = 'block';
+    }
+
+    document.getElementById('cliente').addEventListener('change', function() {
+        const clienteId = this.value;
+
+        if (clienteId) {
+            fetch('/cliente/obtenerPorId', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({ id: clienteId }),
+            })
+                    .then(response => response.json())
+                    .then(data => {
+                        cargarDatosCliente(data.cliente);
+                    })
+                    .catch(error => console.error('Error al cargar datos del cliente:', error));
+        } else {
+            document.getElementById('datos_cliente').style.display = 'none';
+        }
+    });
+
+
+    document.getElementById('cliente').addEventListener('change', function() {
+        const clienteId = this.value;
+        const btnAgregarCliente = document.getElementById('btn_agregar_cliente');
+
+        if (clienteId) {
+            // Si hay un cliente seleccionado, ocultamos el botón de agregar cliente
+            btnAgregarCliente.style.display = 'none';
+
+            // Cargar datos del cliente
+            fetch('/cliente/obtenerDatosClienteResumido', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({ cliente_id: clienteId })
+            })
+                    .then(response => response.json())
+                    .then(cliente => {
+                        // Actualizar los campos con los datos del cliente
+                        document.getElementById('nombre_cliente').textContent = cliente.nombre || 'No disponible';
+                        document.getElementById('dni_cliente').textContent = cliente.dni || 'No disponible';
+                        document.getElementById('provincia').textContent = cliente.provincia || 'No disponible';
+                        document.getElementById('localidad').textContent = cliente.localidad || 'No disponible';
+                        document.getElementById('codigo_postal').textContent = cliente.codigo_postal || 'No disponible';
+                        document.getElementById('direccion').textContent = cliente.direccion || 'No disponible';
+                        document.getElementById('celular').textContent = cliente.celular || 'No disponible';
+
+                        // Mostrar el contenedor con los datos del cliente
+                        document.getElementById('datos_cliente').style.display = 'block';
+                    })
+                    .catch(error => console.error('Error:', error));
+        } else {
+            // Si no hay cliente seleccionado, mostramos el botón
+            btnAgregarCliente.style.display = 'inline-block';
+
+            // Limpiar datos del cliente y ocultar el contenedor
+            document.getElementById('nombre_cliente').textContent = '--';
+            document.getElementById('dni_cliente').textContent = '--';
+            document.getElementById('provincia').textContent = '--';
+            document.getElementById('localidad').textContent = '--';
+            document.getElementById('codigo_postal').textContent = '--';
+            document.getElementById('direccion').textContent = '--';
+            document.getElementById('celular').textContent = '--';
+
+            document.getElementById('datos_cliente').style.display = 'none';
+        }
+    });
+
+    // Función para desactivar el botón y redirigir
+    // Función para redirigir y desactivar el botón
+    function redireccionarYDesactivar() {
+        // Guarda el estado en sessionStorage
+        sessionStorage.setItem('desactivarBotonAgregarCliente', 'true');
+        // Redirige a la vista de registrar cliente
+        window.location.href = '/registro/registrarCliente';
+    }
+
+    // Función para verificar y desactivar el botón cuando se carga la vista
+    function verificarEstadoBoton() {
+        var boton = document.getElementById('btn_agregar_cliente');
+        var estado = sessionStorage.getItem('desactivarBotonAgregarCliente');
+        if (estado === 'true') {
+            boton.disabled = true;
+            boton.innerText = 'Cliente agregado'; // Opcional: Cambia el texto del botón
+            // Limpia el estado en sessionStorage
+            sessionStorage.removeItem('desactivarBotonAgregarCliente');
+        }
+    }
+
+
+    // Ejecuta la función al cargar la página
+    document.addEventListener('DOMContentLoaded', verificarEstadoBoton);
+
+    function toggleFecha(show) {
+        const fechaInput = document.getElementById('fecha');
+        if (show) {
+            fechaInput.style.display = 'block';
+            fechaInput.required = true;
+        } else {
+            fechaInput.style.display = 'none';
+            fechaInput.required = false;
+            fechaInput.value = ''; // Clear the custom date input
+        }
+    }
+
+    // Set current date if "Usar fecha actual" is selected
+    document.querySelector('form').addEventListener('submit', function(event) {
+        const usarFechaActual = document.getElementById('fecha_actual').checked;
+        if (usarFechaActual) {
+            const fechaInput = document.getElementById('fecha');
+            const currentDate = new Date().toISOString().split('T')[0];
+            fechaInput.value = currentDate;
+        }
+    });
+
+</script>
+
+</body>
+</html>

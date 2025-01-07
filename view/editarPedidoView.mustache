@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Pedido</title>
+    <script src="path/to/your/javascript/file.js" defer></script>
+</head>
+<body>
+<h1>Editar Pedido</h1>
+<form id="editarPedidoForm" method="POST" action="/pedido/actualizarPedido">
+    <input type="hidden" name="pedido_id" value="{{pedido.id}}">
+    <label for="cliente">Cliente:</label>
+    <select id="cliente" name="cliente">
+        {{#clientes}}
+            <option value="{{id}}" {{#selectedCliente}}selected{{/selectedCliente}}>{{nombre}}</option>
+        {{/clientes}}
+    </select>
+    <br>
+
+    <div id="productos-container">
+        {{#productos}}
+            <div class="producto">
+                <label for="producto-{{id}}">Producto:</label>
+                <select id="producto-{{id}}" name="productos[{{id}}][id]">
+                    <option value="{{id}}" selected>{{nombre}}</option>
+                </select>
+                <label for="cantidad-{{id}}">Cantidad:</label>
+                <input type="number" id="cantidad-{{id}}" name="productos[{{id}}][cantidad]" value="{{cantidad}}" min="0">
+            </div>
+        {{/productos}}
+    </div>
+
+    <label for="costo_productos">Costo de Productos:</label>
+    <input type="number" id="costo_productos" name="costo_productos" value="{{pedido.costo_productos}}" readonly>
+    <br>
+
+    <label for="costo_envio">Costo de Envío:</label>
+    <input type="number" id="costo_envio" name="costo_envio" value="{{pedido.costo_envio}}" oninput="actualizarCostoTotal()">
+    <br>
+
+    <label for="costo_total">Costo Total:</label>
+    <input type="number" id="costo_total" name="costo_total" value="{{pedido.costo_total}}" readonly>
+    <br>
+
+    <label for="comentario">Comentario:</label>
+    <textarea id="comentario" name="comentario">{{pedido.comentario}}</textarea>
+    <br>
+
+    <label for="factura">Factura:</label>
+    <input type="text" id="factura" name="factura" value="{{pedido.factura}}">
+    <br>
+
+    <label for="medio_de_pago">Medio de Pago:</label>
+    <select id="medio_de_pago" name="medio_de_pago">
+        <option value="Mercado Pago" {{#medioDePagoMercadoPago}}selected{{/medioDePagoMercadoPago}}>Mercado Pago</option>
+        <option value="Tarjeta de Débito" {{#medioDePagoDebito}}selected{{/medioDePagoDebito}}>Tarjeta de Débito</option>
+        <option value="Tarjeta de Crédito" {{#medioDePagoCredito}}selected{{/medioDePagoCredito}}>Tarjeta de Crédito</option>
+        <option value="Efectivo" {{#medioDePagoEfectivo}}selected{{/medioDePagoEfectivo}}>Efectivo</option>
+    </select>
+    <br>
+
+    <button type="submit">Actualizar Pedido</button>
+</form>
+
+<script>
+    // Function to update total cost dynamically
+    function actualizarCostoTotal() {
+        const costoEnvio = parseFloat(document.getElementById('costo_envio').value) || 0;
+        const costoProductos = parseFloat(document.getElementById('costo_productos').value) || 0;
+        const costoTotal = costoEnvio + costoProductos;
+
+        document.getElementById('costo_total').value = costoTotal;
+    }
+
+    // Update product quantities and costs dynamically
+    document.querySelectorAll('.producto').forEach(productoDiv => {
+        productoDiv.querySelector('select').addEventListener('change', actualizarCostoProductos);
+        productoDiv.querySelector('input[type="number"]').addEventListener('input', actualizarCostoProductos);
+    });
+
+    function actualizarCostoProductos() {
+        let costoTotalProductos = 0;
+
+        document.querySelectorAll('.producto').forEach(productoDiv => {
+            const cantidad = parseFloat(productoDiv.querySelector('input[type="number"]').value) || 0;
+            const precio = parseFloat(productoDiv.querySelector('select').selectedOptions[0].dataset.precio) || 0;
+            costoTotalProductos += cantidad * precio;
+        });
+
+        document.getElementById('costo_productos').value = costoTotalProductos;
+        actualizarCostoTotal();
+    }
+</script>
+</body>
+</html>
+

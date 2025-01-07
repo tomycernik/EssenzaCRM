@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil del Cliente</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <style>
+        .pedido {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 8px; /* Reducido para hacer más pequeño el pedido */
+            margin-bottom: 8px; /* Reducido para hacer más pequeño el espacio entre pedidos */
+            cursor: pointer;
+            font-size: 0.9em; /* Tamaño de fuente reducido para hacer el contenido más pequeño */
+        }
+
+        .detalle {
+            display: none;
+            padding: 8px; /* Reducido para hacer más pequeño el detalle */
+            border-top: 1px solid #ddd;
+            font-size: 0.8em; /* Tamaño de fuente reducido en el detalle */
+        }
+
+        .pedido.active .detalle {
+            display: block;
+        }
+
+        .pedido h3 {
+            font-size: 1em; /* Tamaño de fuente para el título de pedido */
+        }
+
+        .pedido p {
+            margin: 2px 0; /* Reducido para compactar el contenido */
+        }
+
+        .pedido ul {
+            padding-left: 20px; /* Añadir un poco de espacio a la izquierda para la lista de productos */
+        }
+
+        .pedido ul li {
+            font-size: 0.8em; /* Tamaño de fuente reducido para los elementos de la lista */
+        }
+    </style>
+</head>
+<body>
+<div class="container mt-5">
+    <div class="mb-4">
+        <h2>Información del Cliente</h2>
+        <p><strong>Nombre:</strong> {{cliente.nombre}}</p>
+        <p><strong>Provincia:</strong> {{cliente.provincia}}</p>
+        <p><strong>Localidad:</strong> {{cliente.localidad}}</p>
+        <p><strong>Celular:</strong> {{cliente.celular}}</p>
+        <p><strong>DNI:</strong> {{cliente.dni}}</p>
+        <p><strong>Cantidad de Pedidos:</strong> {{cantidadPedidos}}</p>
+        <p><strong>Total Gastado:</strong> ${{dineroGastado}}</p>
+        <p><strong>Promedio de días entre pedidos:</strong> {{promedioDiasEntrePedidos}}</p>
+        <p><strong>Fecha del Último Pedido:</strong> {{fechaUltimoPedido}}</p> <!-- Nueva línea agregada -->
+    </div>
+
+    <div>
+        <h2>Pedidos</h2>
+        {{#pedidos}}
+            <div class="pedido" onclick="toggleDetails(this)">
+                <h3>Pedido #{{pedido_id}}</h3>
+                <p><strong>Fecha:</strong> {{fecha}}</p>
+                <p><strong>Costo Total:</strong> ${{costo_total}}</p>
+                <p><strong>Medio de Pago:</strong> {{medio_de_pago}}</p>
+                <div class="detalle">
+                    <h5>Detalles del Pedido</h5>
+                    <p><strong>Cantidad de Productos:</strong> {{cantidad_productos}}</p>
+                    <h5>Productos</h5>
+                    <ul>
+                        {{#productos}}
+                            <li><strong>{{tipo}} - {{aroma}}:</strong> {{cantidad}}</li>
+                        {{/productos}}
+                    </ul>
+                </div>
+            </div>
+        {{/pedidos}}
+    </div>
+</div>
+
+<script>
+    function toggleDetails(element) {
+        element.classList.toggle('active');
+    }
+</script>
+</body>
+</html>
+
+
+
