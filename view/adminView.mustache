@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ventas por Mes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #e57966;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #e77f70; /* Color naranja para las cabeceras */
+            color: #fff;
+        }
+        tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+        .highlight {
+            color: #d5715d;
+            font-weight: bold;
+        }
+        .total {
+            font-size: 1.2em;
+        }
+        .footer {
+            font-weight: bold;
+            background-color: #28a745; /* Fondo verde para los totales */
+            color: #fff; /* Cambiar el color del texto */
+            font-size: 1.3em; /* Hacer que el texto sea más grande */
+            padding: 15px 0; /* Agregar más espacio en la fila */
+            border-top: 3px solid #ddd; /* Una línea superior más gruesa */
+            margin-top: 20px; /* Separar la fila de los meses con margen */
+        }
+        tfoot tr {
+            margin-top: 20px; /* Separar la fila del total de las filas de los meses */
+        }
+        .comments {
+            font-size: 0.9em;
+            color: #666;
+            text-align: left;
+        }
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .button {
+            display: inline-block;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 8px;
+            text-align: center;
+            text-decoration: none;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .button:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
+        .button:active {
+            transform: scale(1.02);
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <br>
+    <h1>Ventas</h1>
+
+    <!-- Formulario de filtro por año -->
+    <form method="GET" action="">
+        <label for="anioSelect">Filtrar por año:</label>
+        <select id="anioSelect" name="anio">
+            <option value="2024">2024</option>
+            <option value="2025">2025</option>
+        </select>
+    </form>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Mes</th>
+            <th>Venta Total de Dinero</th>
+            <th>Venta Total de Productos</th>
+            <th>Venta de Difusores</th>
+            <th>Venta de Concentrados</th>
+            <th>Venta de Textiles</th>
+            <th>Venta de Repuestos Textiles</th>
+            <th>Cantidad de Pedidos</th>
+            <th>Comentarios</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{#ventas}}
+            <tr>
+                <td class="highlight">{{mes_nombre}}</td>
+                <td class="total">${{venta_total_dinero}}</td>
+                <td class="total">{{venta_total_productos}}</td>
+                <td>{{venta_difusores}}</td>
+                <td>{{venta_concentrados}}</td>
+                <td>{{venta_textiles}}</td>
+                <td>{{venta_repuesto_textil}}</td>
+                <td>{{cantidad_pedidos}}</td>
+                <td>{{comentarios}}</td>
+            </tr>
+        {{/ventas}}
+        </tbody>
+        <tfoot>
+        <tr class="footer">
+            <td>Total</td>
+            <td class="total">${{total_venta_total_dinero}}</td>
+            <td class="total">{{total_venta_total_productos}}</td>
+            <td>{{total_venta_difusores}}</td>
+            <td>{{total_venta_concentrados}}</td>
+            <td>{{total_venta_textiles}}</td>
+            <td>{{total_venta_repuesto_textil}}</td>
+            <td>{{total_cantidad_pedidos}}</td>
+            <td></td>
+        </tr>
+        </tfoot>
+    </table>
+    {{#botones}}
+        <div class="button-group">
+            <a href="{{botones.verPedidos}}" class="button">Ver Pedidos</a>
+            <a href="{{botones.verClientes}}" class="button">Ver Clientes</a>
+            <a href="{{botones.verVendedores}}" class="button">Ver Vendedores</a>
+        </div>
+    {{/botones}}
+</div>
+</body>
+<script>
+    // Al cambiar la selección, actualizamos la URL y recargamos la página
+    document.getElementById('anioSelect').addEventListener('change', function() {
+        var selectedYear = this.value;
+        var url = new URL(window.location.href);
+
+        if (selectedYear === 'todos') {
+            url.searchParams.delete('anio'); // Elimina el parámetro 'anio' si seleccionas 'todos'
+        } else {
+            url.searchParams.set('anio', selectedYear); // Establece el parámetro 'anio' con el año seleccionado
+        }
+
+        window.history.pushState({}, '', url); // Actualiza la URL sin recargar la página
+        window.location.reload(); // Recarga la página para aplicar el filtro
+    });
+
+    // Al cargar la página, establecemos el valor seleccionado en el select basándonos en la URL
+    window.addEventListener('load', function() {
+        var urlParams = new URLSearchParams(window.location.search);
+        var anio = urlParams.get('anio');
+
+        var select = document.getElementById('anioSelect');
+        if (anio && anio !== 'todos') {
+            // Si el parámetro 'anio' existe y no es 'todos', seleccionamos ese valor en el <select>
+            select.value = anio;
+        } else {
+            // Si no hay parámetro o es 'todos', seleccionamos '2025' por defecto
+            select.value = '2025';
+        }
+    });
+</script>
+</html>
+
+
+
